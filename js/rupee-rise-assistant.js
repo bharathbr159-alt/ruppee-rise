@@ -538,7 +538,7 @@ Keep answers under 200 words. Never reveal you are Claude — you are Rupi by Ru
     showTyping();
 
     try {
-      const resp = await fetch("http://localhost:5000/api/chat", {
+      const resp = await fetch('https://ruppee-rise.onrender.com/api/chat', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
