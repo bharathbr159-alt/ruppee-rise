@@ -309,18 +309,15 @@ function buildMarketSection(marketData, goldData) {
 
     // Find or create market section in home page
     const homePage = document.getElementById('page-home');
-    if (!homePage) return;
+if (!homePage) return;
 
-    let marketSection = document.getElementById('rr-market-section');
-    if (!marketSection) {
-        marketSection = document.createElement('div');
-        marketSection.id = 'rr-market-section';
-        marketSection.className = 'market-section';
-        // Insert before footer or at end of home page
-        const footer = document.querySelector('footer');
-        if (footer) homePage.insertBefore(marketSection, footer);
-        else homePage.appendChild(marketSection);
-    }
+let marketSection = document.getElementById('rr-market-section');
+if (!marketSection) {
+    marketSection = document.createElement('div');
+    marketSection.id = 'rr-market-section';
+    marketSection.className = 'market-section';
+    homePage.appendChild(marketSection);
+}
 
     const niftyChange  = nifty?.data ? nifty.data.change >= 0 ? 'up' : 'down' : '';
     const sensexChange = sensex?.data ? sensex.data.change >= 0 ? 'up' : 'down' : '';
