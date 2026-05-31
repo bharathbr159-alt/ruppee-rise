@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RupeeRise — Smart Facts</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  body { background: #0a0f0d; color: #e8f0ea; font-family: 'Sora', sans-serif; }
+
+  .facts-wrap { max-width: 1100px; margin: 0 auto; padding: 80px 24px 60px; }
+
+  /* HERO */
+  .facts-hero { text-align: center; padding: 40px 0 48px; }
+  .facts-hero .eyebrow {
+    display: inline-block;
+    background: rgba(45,206,122,0.1); border: 1px solid rgba(45,206,122,0.2);
+    color: #2dce7a; font-size: 11px; font-weight: 600;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 5px 14px; border-radius: 20px; margin-bottom: 1.2rem;
+  }
+  .facts-hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    color: #e8f0ea; line-height: 1.15; margin-bottom: 1rem; letter-spacing: -1px;
+  }
+  .facts-hero h1 em { color: #2dce7a; font-style: italic; }
+  .facts-hero p { color: #8aaa90; font-size: 15px; max-width: 520px; margin: 0 auto; line-height: 1.7; }
+
+  /* TABS */
+  .tabs-bar {
+    display: flex; gap: 8px; flex-wrap: wrap;
+    justify-content: center; margin-bottom: 40px;
+  }
+  .tab-btn {
+    padding: 9px 18px;
+    background: #141f18; border: 1px solid #1e3025;
+    border-radius: 24px; color: #8aaa90;
+    font-family: 'Sora', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tab-btn:hover { border-color: #2dce7a; color: #2dce7a; }
+  .tab-btn.active { background: #2dce7a; color: #0a0f0d; border-color: #2dce7a; font-weight: 700; }
+
+  /* TAB CONTENT */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SECTION */
+  .section-header { margin-bottom: 28px; }
+  .section-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; color: #e8f0ea; margin-bottom: 6px;
+  }
+  .section-header p { font-size: 13px; color: #8aaa90; }
+
+  /* CARDS */
+  .facts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px; margin-bottom: 32px;
+  }
+  .fact-card {
+    background: #141f18; border: 1px solid #1e3025;
+    border-radius: 18px; padding: 24px;
+    transition: transform 0.25s cubic-bezier(.34,1.56,.64,1), border-color 0.2s, box-shadow 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .fact-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--accent, #2dce7a); opacity: 0; transition: opacity 0.2s;
+  }
+  .fact-card:hover { transform: translateY(-5px); border-color: #2a4535; box-shadow: 0 16px 40px rgba(0,0,0,0.3); }
+  .fact-card:hover::before { opacity: 1; }
+  .fact-card.warning { --accent: #f5a623; }
+  .fact-card.danger  { --accent: #e84040; }
+  .fact-card.blue    { --accent: #4a9eff; }
+  .fact-icon { font-size: 28px; margin-bottom: 14px; display: block; }
+  .fact-title { font-size: 15px; font-weight: 600; color: #e8f0ea; margin-bottom: 8px; }
+  .fact-text { font-size: 13px; color: #8aaa90; line-height: 1.7; }
+  .fact-highlight {
+    margin-top: 12px; background: rgba(45,206,122,0.07);
+    border-left: 3px solid #2dce7a; padding: 8px 12px;
+    border-radius: 0 8px 8px 0; font-size: 12px; color: #b8d4bc; line-height: 1.6;
+  }
+  .fact-card.warning .fact-highlight { background: rgba(245,166,35,0.07); border-left-color: #f5a623; }
+  .fact-card.danger  .fact-highlight { background: rgba(232,64,64,0.07);  border-left-color: #e84040; }
+  .fact-card.blue    .fact-highlight { background: rgba(74,158,255,0.07); border-left-color: #4a9eff; }
+
+  /* STATS ROW */
+  .stats-highlight {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px; margin-bottom: 28px;
+  }
+  .stat-hl {
+    background: linear-gradient(135deg, #141f18, #0d1a10);
+    border: 1px solid #1e3025; border-radius: 16px; padding: 20px; text-align: center;
+  }
+  .stat-hl .num { font-family: 'DM Serif Display', serif; font-size: 2rem; color: #2dce7a; line-height: 1; }
+  .stat-hl .num.amber { color: #f5a623; }
+  .stat-hl .num.red   { color: #e84040; }
+  .stat-hl .num.blue  { color: #4a9eff; }
+  .stat-hl .lbl { font-size: 12px; color: #8aaa90; margin-top: 6px; line-height: 1.4; }
+
+  /* BANNER */
+  .banner {
+    border-radius: 20px; padding: 28px 32px; margin-bottom: 28px;
+    display: flex; gap: 20px; align-items: flex-start;
+  }
+  .banner.amber { background: linear-gradient(135deg,#1a1200,#201500); border: 1px solid rgba(245,166,35,0.25); }
+  .banner.red   { background: linear-gradient(135deg,#1a0a0a,#200d0d); border: 1px solid rgba(232,64,64,0.25); }
+  .banner-icon  { font-size: 40px; flex-shrink: 0; }
+  .banner h3    { font-family: 'DM Serif Display', serif; font-size: 1.4rem; margin-bottom: 8px; }
+  .banner.amber h3 { color: #f5a623; }
+  .banner.red   h3 { color: #e84040; }
+  .banner p     { font-size: 13px; line-height: 1.7; }
+  .banner.amber p { color: #c8a870; }
+  .banner.red   p { color: #c89090; }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin-bottom: 28px; }
+  table { width: 100%; border-collapse: collapse; min-width: 480px; }
+  th {
+    background: #172011; color: #8aaa90; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 12px 16px; text-align: left; border-bottom: 2px solid #1e3025;
+  }
+  td { padding: 11px 16px; border-bottom: 1px solid #1a2a1e; font-size: 13px; color: #d0dcd2; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(45,206,122,0.02); }
+  .green { color: #2dce7a; font-weight: 600; }
+  .amber { color: #f5a623; font-weight: 600; }
+  .red   { color: #e84040; font-weight: 600; }
+
+  /* GLOSSARY */
+  .glossary-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 12px;
+  }
+  .gls-item {
+    background: #141f18; border: 1px solid #1e3025; border-radius: 12px; padding: 16px;
+    transition: border-color 0.2s;
+  }
+  .gls-item:hover { border-color: #2a4535; }
+  .gls-term { font-size: 13px; font-weight: 600; color: #2dce7a; margin-bottom: 6px; }
+  .gls-def  { font-size: 12px; color: #8aaa90; line-height: 1.6; }
+
+  footer { border-top: 1px solid #1e3025; padding: 2rem; text-align: center; color: #4a6b52; font-size: 12px; margin-top: 3rem; }
+  footer strong { color: #2dce7a; }
+
+  @media (max-width: 600px) {
+    .facts-wrap { padding: 70px 16px 40px; }
+    .banner { flex-direction: column; gap: 12px; }
+    .tabs-bar { gap: 6px; }
+    .tab-btn { font-size: 12px; padding: 7px 14px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'" style="cursor:pointer;">
+    RupeeRise <span>/ smart facts</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="planner.html">Planner</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+</nav>
+
+<div class="facts-wrap">
+
+  <!-- HERO -->
+  <div class="facts-hero">
+    <div class="eyebrow">Financial Education</div>
+    <h1>Things every Indian investor<br><em>needs to know</em></h1>
+    <p>Real insights on investing, bonds, gold, currency and global markets — explained simply.</p>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="showTab('basics')">📚 Basics</button>
+    <button class="tab-btn" onclick="showTab('bonds')">📜 Bonds</button>
+    <button class="tab-btn" onclick="showTab('gold')">🥇 Gold & Currency</button>
+    <button class="tab-btn" onclick="showTab('global')">🌍 Global Investing</button>
+    <button class="tab-btn" onclick="showTab('risk')">🦁 Risk</button>
+    <button class="tab-btn" onclick="showTab('glossary')">📖 Glossary</button>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 1: BASICS
+  ══════════════════════════════ -->
+  <div class="tab-content active" id="tab-basics">
+    <div class="section-header">
+      <h2>📚 Investment Basics</h2>
+      <p>Fundamental truths every investor must understand before putting money anywhere</p>
+    </div>
+    <div class="facts-grid">
+      <div class="fact-card">
+        <span class="fact-icon">📉</span>
+        <div class="fact-title">50% Loss Reality</div>
+        <div class="fact-text">If your investment falls 50%, you need a 100% gain just to break even. Protecting capital is as important as growing it.</div>
+        <div class="fact-highlight">₹1L → falls to ₹50K → needs to double to get back to ₹1L</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">🔥</span>
+        <div class="fact-title">Inflation Eats Wealth</div>
+        <div class="fact-text">At 6% inflation, ₹1 lakh today is worth only ₹74,000 in 5 years. Money sitting idle loses value silently.</div>
+        <div class="fact-highlight">FD at 7% barely beats 6% inflation. Always invest to stay ahead.</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">📈</span>
+        <div class="fact-title">Compounding Power</div>
+        <div class="fact-text">Starting early is more powerful than investing large amounts later. Time in market beats timing the market.</div>
+        <div class="fact-highlight">₹5,000/month for 30 years at 12% = ₹1.7 Crore. Start 10 years late = only ₹50L</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">🧠</span>
+        <div class="fact-title">Investor Psychology</div>
+        <div class="fact-text">Most investors buy high (greed) and sell low (fear) — the exact opposite of what they should. SIPs remove emotion from investing.</div>
+        <div class="fact-highlight">Automate your SIP and never check it during a market crash</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">🦁</span>
+        <div class="fact-title">Risk vs Reward</div>
+        <div class="fact-text">Higher returns always come with higher risk. FD = low risk, low return. Stocks = high risk, high return. Match risk to your age.</div>
+        <div class="fact-highlight">Rule: Bond % = Your Age. At 35 → 35% bonds, 65% equity</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">🎯</span>
+        <div class="fact-title">80-20 Portfolio Rule</div>
+        <div class="fact-text">Keep 80% in Indian investments and 20% in global investments for balanced risk. India is only 4% of world market — diversify!</div>
+        <div class="fact-highlight">20% global = exposure to Apple, Microsoft, Nvidia growth</div>
+      </div>
+    </div>
+
+    <!-- Age Strategy Table -->
+    <div class="section-header"><h2 style="font-size:1.4rem;">Investment Strategy by Age</h2></div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Age</th><th>Indian Equity</th><th>Global</th><th>Bonds/FD</th><th>Gold ETF</th><th>Focus</th></tr></thead>
+        <tbody>
+          <tr><td><strong>20–30</strong></td><td class="green">60%</td><td class="green">20%</td><td>10%</td><td>10%</td><td>Aggressive growth</td></tr>
+          <tr><td><strong>30–40</strong></td><td class="green">50%</td><td class="green">15%</td><td>20%</td><td>15%</td><td>Balanced growth</td></tr>
+          <tr><td><strong>40–50</strong></td><td class="amber">35%</td><td>10%</td><td class="amber">35%</td><td>20%</td><td>Capital preservation</td></tr>
+          <tr><td><strong>50–60</strong></td><td class="amber">20%</td><td>5%</td><td class="amber">55%</td><td>20%</td><td>Income generation</td></tr>
+          <tr><td><strong>60+</strong></td><td>10%</td><td>0%</td><td class="green">70%</td><td>20%</td><td>Safety & liquidity</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 2: BONDS
+  ══════════════════════════════ -->
+  <div class="tab-content" id="tab-bonds">
+    <div class="section-header">
+      <h2>📜 Bonds — Fixed Income Investing</h2>
+      <p>Everything you need to know about lending money to companies and earning fixed returns</p>
+    </div>
+    <div class="facts-grid">
+      <div class="fact-card blue">
+        <span class="fact-icon">🏦</span>
+        <div class="fact-title">What is a Bond?</div>
+        <div class="fact-text">You lend money to a company or government. They pay you fixed interest (coupon) regularly and return your principal on maturity date. Minimum: ₹10,000 on IndiaBonds.</div>
+        <div class="fact-highlight">Think of it as giving a loan — you're the bank!</div>
+      </div>
+      <div class="fact-card blue">
+        <span class="fact-icon">🛡️</span>
+        <div class="fact-title">Bondholders Get Paid First</div>
+        <div class="fact-text">If a company goes bankrupt, bondholders are paid before shareholders. Senior secured bondholders are first in line — company assets protect them.</div>
+        <div class="fact-highlight">Equity holders get whatever is left — often nothing</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">🪜</span>
+        <div class="fact-title">Bond Laddering Strategy</div>
+        <div class="fact-text">Spread bonds across different maturity dates — 1yr, 3yr, 5yr. This gives regular cash flow and reduces timing risk.</div>
+        <div class="fact-highlight">₹3L (1yr) + ₹3L (3yr) + ₹4L (5yr) = income every year</div>
+      </div>
+      <div class="fact-card blue">
+        <span class="fact-icon">👨‍👧</span>
+        <div class="fact-title">Start Early — Even for Children</div>
+        <div class="fact-text">A ₹50,000 portfolio started for a 14-year-old at 12% return becomes ₹2.2L by age 21 — more than many starting salaries!</div>
+        <div class="fact-highlight">Financial literacy + early investing = generational wealth</div>
+      </div>
+      <div class="fact-card warning">
+        <span class="fact-icon">🏠</span>
+        <div class="fact-title">Bonds Beat Real Estate Income</div>
+        <div class="fact-text">Real estate gives 2-3% rental yield after maintenance and taxes. Bonds give 8-11% with zero maintenance. Plus bonds are liquid — you can't sell half a flat!</div>
+        <div class="fact-highlight">₹50L in bonds = ₹4-5L/year. ₹50L flat = ₹1-1.5L/year rent after costs</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">🔄</span>
+        <div class="fact-title">Repo Rate & Bonds</div>
+        <div class="fact-text">When RBI raises repo rate, new bonds offer higher interest but your old bonds lose market value. Once you buy, your coupon rate stays fixed regardless.</div>
+        <div class="fact-highlight">Don't panic about repo rate changes after buying — returns are locked in</div>
+      </div>
+      <div class="fact-card warning">
+        <span class="fact-icon">💸</span>
+        <div class="fact-title">TDS on Bond Interest</div>
+        <div class="fact-text">Bond interest has 10% TDS. If income below ₹12L, claim it back via ITR. Pro tip: gift bonds to retired parents — their lower tax slab saves money legally.</div>
+        <div class="fact-highlight">Always file ITR to claim bond TDS refunds</div>
+      </div>
+      <div class="fact-card danger">
+        <span class="fact-icon">⚠️</span>
+        <div class="fact-title">Harshad Mehta 1992 Warning</div>
+        <div class="fact-text">In 1992, Harshad Mehta manipulated markets causing a massive crash. No digital oversight existed. This led to SEBI's formation. Always use regulated platforms.</div>
+        <div class="fact-highlight">If returns seem too good to be true — they are. Avoid unregulated schemes.</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Term</th><th>Definition</th><th>Why It Matters</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Coupon Rate</strong></td><td>Fixed annual interest % on bond</td><td class="green">Your guaranteed income</td></tr>
+          <tr><td><strong>Maturity Date</strong></td><td>Date principal is returned</td><td class="amber">Plan cash flow around this</td></tr>
+          <tr><td><strong>YTM</strong></td><td>Total return if held till maturity</td><td class="green">Best way to compare bonds</td></tr>
+          <tr><td><strong>Credit Rating</strong></td><td>AAA=safest, D=defaulted</td><td class="red">Never invest below BBB</td></tr>
+          <tr><td><strong>Senior Bond</strong></td><td>First priority in repayment</td><td class="green">Safest bond type</td></tr>
+          <tr><td><strong>Subordinated Bond</strong></td><td>Lower priority, higher interest</td><td class="amber">Higher return, higher risk</td></tr>
+          <tr><td><strong>Debenture Trustee</strong></td><td>Monitors issuer compliance</td><td class="green">Your protector — must have one</td></tr>
+          <tr><td><strong>Bond Laddering</strong></td><td>Bonds at staggered maturities</td><td class="green">Regular cash flow</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 3: GOLD & CURRENCY
+  ══════════════════════════════ -->
+  <div class="tab-content" id="tab-gold">
+    <div class="section-header">
+      <h2>🥇 Gold & Indian Rupee</h2>
+      <p>Why the rupee is weakening and the hard truth about gold investments</p>
+    </div>
+
+    <div class="stats-highlight">
+      <div class="stat-hl"><div class="num amber">₹96</div><div class="lbl">Current INR/USD rate</div></div>
+      <div class="stat-hl"><div class="num red">₹120–130</div><div class="lbl">Predicted by 2029</div></div>
+      <div class="stat-hl"><div class="num red">88%</div><div class="lbl">India's oil imported</div></div>
+      <div class="stat-hl"><div class="num amber">₹7,000+</div><div class="lbl">Gold per gram today</div></div>
+    </div>
+
+    <div class="banner amber">
+      <div class="banner-icon">⚠️</div>
+      <div>
+        <h3>Should You Buy Physical Gold? Think Again.</h3>
+        <p>Gold has surged from ₹4,000 to ₹7,000+/gram but buying physical gold <strong style="color:#f5a623;">hurts India's economy and your own returns</strong>. When you buy gold, India imports more — increasing dollar demand, weakening INR, worsening the trade deficit. There are smarter ways to get gold exposure.</p>
+      </div>
+    </div>
+
+    <div class="facts-grid">
+      <div class="fact-card danger">
+        <span class="fact-icon">🚫</span>
+        <div class="fact-title">Physical Gold Hurts Economy</div>
+        <div class="fact-text">India imports most gold. Every gram bought increases India's dollar outflow — weakening rupee and increasing inflation for everyone.</div>
+        <div class="fact-highlight">India has ₹100+ lakh crore in idle physical gold — a "dead economy" trap</div>
+      </div>
+      <div class="fact-card danger">
+        <span class="fact-icon">💸</span>
+        <div class="fact-title">Hidden Costs of Gold Jewellery</div>
+        <div class="fact-text">Making charges (10-25%) + GST (3%) + storage costs = you lose 15-30% immediately. Gold jewellery as investment is a very bad idea.</div>
+        <div class="fact-highlight">You'll rarely recover making charges when selling jewellery</div>
+      </div>
+      <div class="fact-card warning">
+        <span class="fact-icon">📦</span>
+        <div class="fact-title">Gold Generates Zero Income</div>
+        <div class="fact-text">Physical gold in a locker earns nothing — no dividends, no interest. It only gains if prices rise. Meanwhile your money isn't working.</div>
+        <div class="fact-highlight">₹5L in SIP vs ₹5L in physical gold over 10 years — SIP wins by far</div>
+      </div>
+      <div class="fact-card blue">
+        <span class="fact-icon">✅</span>
+        <div class="fact-title">Better: Sovereign Gold Bonds</div>
+        <div class="fact-text">SGBs give gold price gains + 2.5% annual interest + zero capital gains tax if held till maturity. No making charges, no storage needed.</div>
+        <div class="fact-highlight">Best of all worlds — gold exposure + income + tax benefit</div>
+      </div>
+      <div class="fact-card warning">
+        <span class="fact-icon">🛢️</span>
+        <div class="fact-title">Oil Price → Inflation → You</div>
+        <div class="fact-text">India imports 88% crude oil. Oil $60 → $110 + INR falling = import bill doubled. Higher petrol → higher transport → everything gets expensive.</div>
+        <div class="fact-highlight">School fees up 30%, groceries up — middle class loses disposable income</div>
+      </div>
+      <div class="fact-card danger">
+        <span class="fact-icon">🏛️</span>
+        <div class="fact-title">Possible Gold Import Ban</div>
+        <div class="fact-text">As INR weakens toward ₹120-130 by 2029, India may restrict gold imports to protect forex reserves — reducing physical gold liquidity.</div>
+        <div class="fact-highlight">Another reason to hold Gold ETFs instead of physical gold</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 4: GLOBAL INVESTING
+  ══════════════════════════════ -->
+  <div class="tab-content" id="tab-global">
+    <div class="section-header">
+      <h2>🌍 Global Investing for Indians</h2>
+      <p>How to invest in Apple, Nvidia and global ETFs from India — legally and cheaply</p>
+    </div>
+
+    <div class="stats-highlight">
+      <div class="stat-hl"><div class="num blue">80%</div><div class="lbl">US share of global markets</div></div>
+      <div class="stat-hl"><div class="num">4%</div><div class="lbl">India's global market share</div></div>
+      <div class="stat-hl"><div class="num green">36%</div><div class="lbl">NASDAQ ETF recent annual return</div></div>
+      <div class="stat-hl"><div class="num amber">₹20L</div><div class="lbl">LRS limit per person per year</div></div>
+    </div>
+
+    <div class="facts-grid">
+      <div class="fact-card blue">
+        <span class="fact-icon">🇺🇸</span>
+        <div class="fact-title">India is Only 4% of World</div>
+        <div class="fact-text">Investing only in India means ignoring 96% of global wealth creation. The US is 80% of global market cap — you're missing massive growth.</div>
+        <div class="fact-highlight">Diversifying globally reduces risk and captures worldwide growth</div>
+      </div>
+      <div class="fact-card blue">
+        <span class="fact-icon">🏙️</span>
+        <div class="fact-title">Gift City — India's Gateway</div>
+        <div class="fact-text">GIFT City (Gujarat) lets Indians buy US stocks, ETFs legally with SEBI protection. Zero-cost DEMAT, investor protection up to $500,000.</div>
+        <div class="fact-highlight">Buy Apple/Nvidia/Microsoft with just ₹1,000-2,000</div>
+      </div>
+      <div class="fact-card blue">
+        <span class="fact-icon">💻</span>
+        <div class="fact-title">Fractional Shares</div>
+        <div class="fact-text">Can't afford 1 Amazon share at ₹15,000? Buy fractional shares — even ₹500 worth of any US stock. Makes global investing accessible to everyone.</div>
+        <div class="fact-highlight">Start global investing with just ₹500 per month</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">💰</span>
+        <div class="fact-title">Ultra Low Fees</div>
+        <div class="fact-text">Global ETFs via Gift City: 0.03% expense ratio vs 1.5% for international mutual funds. On ₹10L investment that's ₹300 vs ₹15,000/year in fees!</div>
+        <div class="fact-highlight">Always choose direct route via Gift City over international MFs</div>
+      </div>
+      <div class="fact-card warning">
+        <span class="fact-icon">📋</span>
+        <div class="fact-title">Tax on Global Investments</div>
+        <div class="fact-text">Long-term capital gains: 12.5% in India. US dividends: 25% withheld but DTAA treaty gives credit — no double taxation. Hold long-term for maximum efficiency.</div>
+        <div class="fact-highlight">DTAA = you pay tax only once between India and US</div>
+      </div>
+      <div class="fact-card">
+        <span class="fact-icon">🔬</span>
+        <div class="fact-title">Best Global Sectors</div>
+        <div class="fact-text">Semiconductors (Nvidia, TSMC, Micron), US Tech (Apple, Microsoft, Amazon), Natural Resources (gold, uranium, rare earth ETFs).</div>
+        <div class="fact-highlight">These sectors will drive global growth for the next 10-20 years</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Investment Route</th><th>Min Amount</th><th>Expense Ratio</th><th>Protection</th><th>Recommended</th></tr></thead>
+        <tbody>
+          <tr><td>Gift City DEMAT</td><td>₹1,000</td><td class="green">0.03%</td><td class="green">SEBI + $500K</td><td class="green">✅ Best</td></tr>
+          <tr><td>International Mutual Funds</td><td>₹500 SIP</td><td class="red">1.5%</td><td class="amber">SEBI regulated</td><td class="amber">OK</td></tr>
+          <tr><td>Direct US Brokerage</td><td>$1</td><td class="green">0.03%</td><td class="amber">US SIPC only</td><td class="amber">OK if LRS compliant</td></tr>
+          <tr><td>Unregulated platforms</td><td>Varies</td><td>Unknown</td><td class="red">None</td><td class="red">❌ Avoid</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 5: RISK
+  ══════════════════════════════ -->
+  <div class="tab-content" id="tab-risk">
+    <div class="section-header">
+      <h2>🦁 Understanding Investment Risk</h2>
+      <p>The lion in a cage analogy — risk exists everywhere, what matters is how well it's contained</p>
+    </div>
+
+    <div class="banner red">
+      <div class="banner-icon">🦁</div>
+      <div>
+        <h3>Imagine a lion inside a cage</h3>
+        <p>The lion is dangerous but the cage controls the risk. You can stand near the cage (investing) without getting hurt — as long as the cage is strong. But enter the cage (reckless investing) and you're in real danger. <strong style="color:#e84040;">Risk exists in all investments. The key is how well it's contained.</strong></p>
+      </div>
+    </div>
+
+    <div class="facts-grid">
+      <div class="fact-card">
+        <span class="fact-icon">🚶</span>
+        <div class="fact-title">100 Metres Away — No Investing</div>
+        <div class="fact-text">You're safe but money isn't growing. Inflation eats savings silently. This is keeping money in savings account or under the mattress.</div>
+        <div class="fact-highlight">0% risk but inflation still wins. Not investing IS a risk.</div>
+      </div>
+      <div class="fact-card blue">
+        <span class="fact-icon">🏛️</span>
+        <div class="fact-title">Outside the Cage — Bonds & FDs</div>
+        <div class="fact-text">Protected by strong bars (credit ratings + debenture trustees). Even if company fails, secured bondholders get paid from assets first.</div>
+        <div class="fact-highlight">8-11% returns. Cage = credit rating + trustee + SEBI oversight</div>
+      </div>
+      <div class="fact-card warning">
+        <span class="fact-icon">🚪</span>
+        <div class="fact-title">Cage Door Open — Mutual Funds</div>
+        <div class="fact-text">Door is open but a trained handler (fund manager) is present. Risk exists but it's professionally managed and diversified across many companies.</div>
+        <div class="fact-highlight">12-15% potential. Handler = fund manager + SEBI regulation</div>
+      </div>
+      <div class="fact-card danger">
+        <span class="fact-icon">⚡</span>
+        <div class="fact-title">Inside the Cage — Direct Equity</div>
+        <div class="fact-text">You're directly with the lion. Equity holders are LAST paid in bankruptcy. Stock can go to zero. But also potential for 10x returns.</div>
+        <div class="fact-highlight">Last priority in bankruptcy. Maximum risk = maximum reward.</div>
+      </div>
+      <div class="fact-card danger">
+        <span class="fact-icon">🔓</span>
+        <div class="fact-title">Broken Cage — Unrated Bonds</div>
+        <div class="fact-text">Unsecured, unrated bonds with no debenture trustee = broken cage. Company default risk can strike without warning. Avoid completely.</div>
+        <div class="fact-highlight">No rating + no security = gambling, not investing</div>
+      </div>
+      <div class="fact-card blue">
+        <span class="fact-icon">📹</span>
+        <div class="fact-title">CCTV & Police — SEBI Regulations</div>
+        <div class="fact-text">Post-1992 Harshad Mehta scam, SEBI created strict market oversight — like adding CCTV and police to the lion's enclosure. Markets are far safer today.</div>
+        <div class="fact-highlight">1992: No oversight → market crash. 2024: SEBI monitors everything.</div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Investment</th><th>Risk</th><th>Bankruptcy Priority</th><th>Expected Return</th><th>Lion Analogy</th></tr></thead>
+        <tbody>
+          <tr><td>FD / PPF</td><td class="green">Very Low</td><td class="green">Govt backed</td><td>6-8%</td><td>100 metres away</td></tr>
+          <tr><td>Senior Secured Bonds</td><td class="green">Low</td><td class="green">1st — Paid First</td><td>8-10%</td><td>Outside cage, strong bars</td></tr>
+          <tr><td>Subordinated Bonds</td><td class="amber">Medium</td><td class="amber">2nd priority</td><td>10-12%</td><td>Outside cage, thinner bars</td></tr>
+          <tr><td>Mutual Funds</td><td class="amber">Medium</td><td>Varies</td><td>12-15%</td><td>Door open, handler present</td></tr>
+          <tr><td>Direct Equity</td><td class="red">High</td><td class="red">Last — After everyone</td><td>15-20%+</td><td>Inside the cage</td></tr>
+          <tr><td>Unrated Bonds</td><td class="red">Very High</td><td class="red">Uncertain</td><td>High but risky</td><td>Broken cage — avoid!</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+       TAB 6: GLOSSARY
+  ══════════════════════════════ -->
+  <div class="tab-content" id="tab-glossary">
+    <div class="section-header">
+      <h2>📖 Financial Terms Explained</h2>
+      <p>All the jargon decoded in plain simple language</p>
+    </div>
+    <div class="glossary-grid">
+      <div class="gls-item"><div class="gls-term">SIP</div><div class="gls-def">Systematic Investment Plan — invest fixed amount monthly in mutual funds automatically</div></div>
+      <div class="gls-item"><div class="gls-term">DEMAT Account</div><div class="gls-def">Electronic account for holding stocks, bonds and ETFs in digital form</div></div>
+      <div class="gls-item"><div class="gls-term">ETF</div><div class="gls-def">Exchange Traded Fund — basket of assets that trades on stock exchange like a single share</div></div>
+      <div class="gls-item"><div class="gls-term">Coupon Rate</div><div class="gls-def">Fixed annual interest % paid on a bond — your guaranteed income from the bond</div></div>
+      <div class="gls-item"><div class="gls-term">YTM</div><div class="gls-def">Yield to Maturity — total return you get if you hold the bond till its end date</div></div>
+      <div class="gls-item"><div class="gls-term">Credit Rating</div><div class="gls-def">AAA = safest company, D = defaulted. Never invest in bonds below BBB rating</div></div>
+      <div class="gls-item"><div class="gls-term">Debenture Trustee</div><div class="gls-def">Regulated entity that monitors bond issuers and protects bondholder interests</div></div>
+      <div class="gls-item"><div class="gls-term">Bond Laddering</div><div class="gls-def">Buying bonds at different maturity dates to get regular income and reduce risk</div></div>
+      <div class="gls-item"><div class="gls-term">Repo Rate</div><div class="gls-def">Rate at which RBI lends to banks — the base rate that controls all interest rates in India</div></div>
+      <div class="gls-item"><div class="gls-term">GIFT City (IFSC)</div><div class="gls-def">Gujarat International Finance Tech-City — India's regulated hub for investing in global markets</div></div>
+      <div class="gls-item"><div class="gls-term">LRS</div><div class="gls-def">Liberalized Remittance Scheme — RBI allows Indians to send up to ₹20L abroad per year for investing</div></div>
+      <div class="gls-item"><div class="gls-term">DTAA</div><div class="gls-def">Double Tax Avoidance Agreement — prevents paying tax twice on same income in two countries</div></div>
+      <div class="gls-item"><div class="gls-term">Expense Ratio</div><div class="gls-def">Annual fee charged by mutual fund for managing your money — lower is always better</div></div>
+      <div class="gls-item"><div class="gls-term">Sovereign Gold Bond</div><div class="gls-def">Govt bond linked to gold price — gives gold gains + 2.5% interest + no capital gains tax</div></div>
+      <div class="gls-item"><div class="gls-term">Fractional Shares</div><div class="gls-def">Buy a portion of a share — invest ₹500 in Amazon without buying a full share</div></div>
+      <div class="gls-item"><div class="gls-term">Fiscal Deficit</div><div class="gls-def">When govt spends more than it earns — limits ability to control inflation</div></div>
+      <div class="gls-item"><div class="gls-term">Dead Economy</div><div class="gls-def">Money trapped in non-productive assets like physical gold/real estate — slows economic growth</div></div>
+      <div class="gls-item"><div class="gls-term">Beta</div><div class="gls-def">How much a stock moves vs the market. Beta > 1 = more volatile. Beta < 1 = more stable</div></div>
+      <div class="gls-item"><div class="gls-term">TDS</div><div class="gls-def">Tax Deducted at Source — 10% auto-deducted on bond interest. Claim back via ITR filing</div></div>
+      <div class="gls-item"><div class="gls-term">Senior Bond</div><div class="gls-def">First priority in repayment if company goes bankrupt — safest type of bond</div></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <strong>RupeeRise</strong> — For educational purposes only.
+  Always consult a SEBI-registered advisor before investing.
+</footer>
+
+<script>
+function showTab(id) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+
+<script src="js/ui-enhancements.js"></script>
+<script>window.RUPEE_AI_KEY = "";</script>
+<script src="js/rupee-rise-assistant.js"></script>
+
+</body>
+</html>

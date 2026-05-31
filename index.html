@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>RupeeRise — Smart Investing for Every Indian</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+</head>
+
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">
+    RupeeRise <span>/ invest smart</span>
+  </div>
+
+ 
+  <div class="nav-links">
+    <a onclick="showPage('schemes')">Schemes</a>
+    <a onclick="showPage('compare')">Compare</a>
+    <a onclick="showPage('learn')">Learn</a>
+    <a href="planner.html">Planner</a>
+    <a href="dashboard.html">Dashboard</a>
+    
+  </div>
+
+  
+<div id="auth-area"></div>
+
+</nav>
+<!-- Navbar -->
+
+
+  
+
+<!-- ===== HOME PAGE ===== -->
+
+<div id="page-home" class="page active">
+
+  <div class="hero">
+
+    <div class="hero-eyebrow">
+      For every Indian investor
+    </div>
+
+    <h1>
+      Grow your money<br>
+      <em>the smart way</em>
+    </h1>
+
+    <p>
+      Understand FD, SIP, PPF, Stocks, Gold and more — with simple explanations and live calculators that show exactly what you'll earn.
+    </p>
+
+    <button class="btn-primary" onclick="showPage('schemes')">
+      Explore all schemes
+    </button>
+
+    <button class="btn-secondary" onclick="showPage('compare')">
+      Compare returns
+    </button>
+
+    <div class="stats-row">
+
+      <div class="stat-item">
+        <span class="stat-num">10+</span>
+        <span class="stat-label">Investment types</span>
+      </div>
+
+      <div class="stat-item">
+        <span class="stat-num">₹→₹₹</span>
+        <span class="stat-label">Live calculators</span>
+      </div>
+
+      <div class="stat-item">
+        <span class="stat-num">0%</span>
+        <span class="stat-label">Jargon used</span>
+      </div>
+
+    </div>
+
+  </div>
+
+<!-- NEW INVESTMENT FEATURES SECTION -->
+
+<div class="section">
+
+  <div class="section-title">
+    Why Choose RupeeRise
+  </div>
+
+  <div class="section-sub">
+    Simple investing tools and financial education designed for every Indian investor
+  </div>
+
+  <div class="feature-grid">
+
+    <div class="feature-card">
+
+      <h3>Smart SIP Planning</h3>
+
+      <p>
+        Plan monthly investments and build long-term wealth with disciplined investing.
+      </p>
+
+    </div>
+
+    <div class="feature-card">
+
+      <h3>Bond Learning</h3>
+
+      <p>
+        Understand corporate bonds, fixed income, coupon rates and credit ratings easily.
+      </p>
+
+    </div>
+
+    <div class="feature-card">
+
+      <h3>Live Calculators</h3>
+
+      <p>
+        Instantly compare returns across FD, SIP, Gold and Mutual Funds.
+      </p>
+
+    </div>
+
+    <div class="feature-card">
+
+      <h3>Risk Analysis</h3>
+
+      <p>
+        Analyze your financial risk profile and choose suitable investments.
+      </p>
+
+    </div>
+
+    <div class="feature-card">
+
+      <h3>Financial Literacy</h3>
+
+      <p>
+        Learn investing concepts in beginner-friendly language without confusion.
+      </p>
+
+    </div>
+
+    <div class="feature-card">
+
+      <h3>AI Investment Assistant</h3>
+
+      <p>
+        Get intelligent investment suggestions based on your income and goals.
+      </p>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+
+  <div class="section" style="padding-top:0">
+
+    <div class="section-title">
+      Popular schemes
+    </div>
+
+    <div class="section-sub">
+      Click any scheme to learn how it works and calculate your returns
+    </div>
+
+    <div class="scheme-grid" id="home-scheme-grid"></div>
+
+  </div>
+
+  <div class="section">
+
+    <div class="whatif-card">
+
+      <h3>What if I invest every month?</h3>
+
+      <p>
+        See how much ₹5,000/month grows over 10 years across different options
+      </p>
+
+      <div class="whatif-amounts" id="whatif-btns">
+
+        <button class="amount-btn active" data-amt="1000">
+          ₹1,000
+        </button>
+
+        <button class="amount-btn" data-amt="5000">
+          ₹5,000
+        </button>
+
+        <button class="amount-btn" data-amt="10000">
+          ₹10,000
+        </button>
+
+        <button class="amount-btn" data-amt="25000">
+          ₹25,000
+        </button>
+
+        <button class="amount-btn" data-amt="50000">
+          ₹50,000
+        </button>
+
+      </div>
+
+      <div id="whatif-bars" style="margin-top:1.5rem"></div>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ===== SCHEMES PAGE ===== -->
+
+<div id="page-schemes" class="page">
+
+  <div class="section">
+
+    <div class="section-title">
+      All Investment Schemes
+    </div>
+
+    <div class="section-sub">
+      Choose any scheme to see how it works and calculate your returns
+    </div>
+
+    <div class="scheme-grid" id="all-scheme-grid"></div>
+
+  </div>
+</div>
+
+<!-- ===== DETAIL PAGE ===== -->
+
+<div id="page-detail" class="page">
+
+  <div class="section" id="detail-content"></div>
+
+</div>
+
+<!-- ===== COMPARE PAGE ===== -->
+
+<div id="page-compare" class="page">
+
+  <div class="section">
+
+    <div class="section-title">
+      Compare Returns
+    </div>
+
+    <div class="section-sub">
+      Select schemes and set your investment amount to compare final returns
+    </div>
+
+    <div class="compare-controls">
+
+      <h3>Monthly investment amount</h3>
+
+      <div class="calc-row">
+
+        <div class="calc-label">
+          <span>Monthly SIP amount</span>
+          <span class="val" id="cmp-amt-val">₹5,000</span>
+        </div>
+
+        <input
+          type="range"
+          min="500"
+          max="50000"
+          step="500"
+          value="5000"
+          id="cmp-amt"
+          oninput="updateCompare()"
+        >
+
+      </div>
+
+      <div class="calc-row">
+
+        <div class="calc-label">
+          <span>Duration (years)</span>
+          <span class="val" id="cmp-yr-val">10 years</span>
+        </div>
+
+        <input
+          type="range"
+          min="1"
+          max="30"
+          step="1"
+          value="10"
+          id="cmp-yr"
+          oninput="updateCompare()"
+        >
+
+      </div>
+
+      <h3 style="margin-top:1rem">
+        Select schemes to compare
+      </h3>
+
+      <div class="compare-check-grid" id="cmp-checks"></div>
+
+    </div>
+
+    <div class="info-card" style="margin-bottom:1.5rem">
+
+      <h3>Projected final value</h3>
+
+      <div id="compare-bars-wrap"></div>
+
+    </div>
+
+    <div class="chart-wrap" style="height:300px">
+
+      <canvas id="compareChart"></canvas>
+
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ===== LEARN PAGE ===== -->
+
+<div id="page-learn" class="page">
+
+  <div class="section">
+
+    <div class="section-title">
+      Learn the basics
+    </div>
+
+    <div class="section-sub">
+      Simple answers to the most important finance questions
+    </div>
+
+    <div class="learn-grid" id="learn-grid"></div>
+
+  </div>
+  
+      <a href="facts.html" class="facts-btn">
+        ✨ Explore More Interesting Facts
+      </a>
+
+    </div>
+
+</div>
+
+
+<footer>
+  <strong>RupeeRise</strong> — For educational purposes only.
+  Always consult a SEBI-registered advisor before investing.
+</footer>
+<script>window.RUPEE_AI_KEY = "";</script>
+<script src="js/data.js"></script>
+<script src="js/helpers.js"></script>
+<script src="js/router.js"></script>
+<script src="js/schemes.js"></script>
+<script src="js/detail.js"></script>
+<script src="js/compare.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/learn.js"></script>
+<script src="js/whatif.js"></script>
+<script src="js/app.js"></script>
+<script src="planner.js"></script>
+
+<!-- Rupi AI Assistant -->
+<script src="js/rupee-rise-assistant.js"></script>
+<script src="js/market-data.js"></script>
+<script src="js/ui-enhancements.js"></script>
+
+
+<script>
+const authArea = document.getElementById("auth-area");
+const user = JSON.parse(localStorage.getItem("rr_user"));
+
+if (user) {
+    authArea.innerHTML = `
+        <div class="profile-menu">
+            <button class="profile-btn" onclick="toggleDropdown()">
+                <div class="avatar">
+                    ${user.fullname.charAt(0).toUpperCase()}
+                </div>
+                <span>${user.fullname}</span>
+                <span>▼</span>
+            </button>
+
+            <div class="dropdown" id="dropdown">
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    `;
+} else {
+    authArea.innerHTML = `
+        <a href="auth.html" class="login-link">Login</a>
+    `;
+}
+
+function toggleDropdown() {
+    document.getElementById("dropdown").classList.toggle("show");
+}
+
+function logout() {
+    localStorage.removeItem("rr_user");
+    window.location.reload();
+}
+</script>
+</body>
+</html>
+

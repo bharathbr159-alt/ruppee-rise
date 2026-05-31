@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RupeeRise Planner</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --green: #00C896;
+    --yellow: #FFD166;
+    --red: #FF6B6B;
+    --blue: #4f7cff;
+    --bg: #0A0F0A;
+    --surface: #111811;
+    --surface2: #1a221a;
+    --border: rgba(0,200,150,0.15);
+    --text: #e8f5e8;
+    --muted: #6b8f6b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); }
+
+  nav { display: flex; justify-content: space-between; align-items: center; padding: 18px 40px; border-bottom: 1px solid var(--border); background: var(--surface); }
+  .nav-logo { font-size: 20px; font-weight: 700; color: var(--green); }
+  .nav-logo span { color: var(--muted); font-weight: 300; font-size: 14px; }
+  .nav-links a { color: var(--muted); text-decoration: none; margin-left: 24px; font-size: 14px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--green); }
+
+  .planner-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+
+  .planner-top { display: grid; grid-template-columns: 420px 1fr; gap: 24px; margin-bottom: 24px; }
+
+  .form-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+  }
+  .form-card h2 { font-size: 20px; margin-bottom: 6px; color: var(--text); }
+  .form-card p { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    color: var(--green);
+    text-transform: uppercase;
+    margin: 18px 0 10px;
+  }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-grid.single { grid-template-columns: 1fr; }
+
+  input, select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input::placeholder { color: var(--muted); }
+  input:focus, select:focus { border-color: var(--green); }
+  select option { background: #1a221a; }
+
+  .checkbox-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--muted);
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .checkbox-row input { width: auto; }
+  .checkbox-row:has(input:checked) { border-color: var(--green); color: var(--text); }
+
+  .analyze-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--green), #00A3FF);
+    border: none;
+    border-radius: 12px;
+    color: #0a0f0a;
+    font-family: 'Sora', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.2s;
+    letter-spacing: 0.02em;
+  }
+  .analyze-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+  .score-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .score-card::before {
+    content: '';
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,200,150,0.06), transparent 70%);
+    top: -80px; right: -80px;
+  }
+
+  .score-label { font-size: 12px; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 16px; }
+  .score-ring { position: relative; width: 180px; height: 180px; margin: 0 auto 20px; }
+  .score-ring svg { transform: rotate(-90deg); }
+  .score-ring-bg { fill: none; stroke: var(--surface2); stroke-width: 12; }
+  .score-ring-fill { fill: none; stroke-width: 12; stroke-linecap: round; transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1), stroke 0.5s; }
+  .score-number {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 52px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .score-grade { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .vuln-list { width: 100%; display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .vuln-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+  }
+  .vuln-item.ok { border-color: rgba(0,200,150,0.3); }
+  .vuln-item.warn { border-color: rgba(255,209,102,0.3); }
+  .vuln-item.bad { border-color: rgba(255,107,107,0.3); }
+  .vuln-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .vuln-dot.ok { background: var(--green); }
+  .vuln-dot.warn { background: var(--yellow); }
+  .vuln-dot.bad { background: var(--red); }
+
+  .bottom-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 24px; }
+
+  .info-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+  }
+  .info-card h3 { font-size: 14px; color: var(--muted); margin-bottom: 20px; font-weight: 500; }
+
+  .stat-big { font-size: 32px; font-weight: 700; color: var(--green); }
+  .stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .allocation-grid { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+  .alloc-row { display: flex; align-items: center; gap: 10px; }
+  .alloc-label { font-size: 12px; color: var(--muted); width: 60px; }
+  .alloc-bar-wrap { flex: 1; background: var(--surface2); border-radius: 6px; height: 8px; overflow: hidden; }
+  .alloc-bar { height: 100%; border-radius: 6px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+  .alloc-pct { font-size: 12px; color: var(--text); width: 36px; text-align: right; }
+
+  .analysis-cards-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+  }
+  .mini-card h4 { font-size: 11px; color: var(--muted); margin-bottom: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; }
+  .mini-card .val { font-size: 22px; font-weight: 700; color: var(--green); }
+
+  .goal-year-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+
+  .goal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+  }
+  .goal-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .goal-card p { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  .goal-inputs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+  .calc-btn {
+    padding: 12px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--green);
+    border-radius: 10px;
+    color: var(--green);
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    width: 100%;
+  }
+  .calc-btn:hover { background: var(--green); color: #0a0f0a; }
+
+  .goal-result {
+    margin-top: 14px;
+    padding: 14px;
+    background: var(--surface2);
+    border-radius: 10px;
+    font-size: 13px;
+    color: var(--text);
+    display: none;
+    line-height: 1.7;
+  }
+  .goal-result strong { color: var(--green); }
+
+  .insight-box {
+    background: linear-gradient(135deg, rgba(0,200,150,0.08), rgba(0,163,255,0.05));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text);
+    margin-bottom: 24px;
+    min-height: 80px;
+  }
+
+  .chart-wrap { position: relative; height: 220px; }
+  .placeholder { color: var(--muted); font-size: 14px; text-align: center; padding: 40px 0; }
+
+  @media (max-width: 900px) {
+    .planner-top { grid-template-columns: 1fr; }
+    .bottom-grid { grid-template-columns: 1fr 1fr; }
+    .analysis-cards-row { grid-template-columns: 1fr 1fr; }
+    .goal-year-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .planner-wrap { padding: 20px 12px; }
+    .bottom-grid { grid-template-columns: 1fr; }
+    .analysis-cards-row { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">
+    RupeeRise <span>/ invest smart</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="dashboard.html">Dashboard</a>
+  </div>
+</nav>
+
+<div class="planner-wrap">
+
+  <div class="planner-top">
+
+    <div class="form-card">
+      <h2>Financial Planner</h2>
+      <p>Enter your details to get a personalized financial health score and investment plan.</p>
+      <p style="font-size:11px; color:var(--green); background:rgba(0,200,150,0.06); padding:8px 12px; border-radius:8px; margin-bottom:0;">💡 Use shorthand: <strong>50k</strong> = ₹50,000 &nbsp;·&nbsp; <strong>1.5L</strong> = ₹1,50,000 &nbsp;·&nbsp; <strong>2Cr</strong> = ₹2,00,00,000</p>
+
+      <div class="section-label">💰 Income & Savings</div>
+      <div class="form-grid">
+        <input type="text" id="salary" placeholder="Monthly Income e.g. 50k, 1.5L">
+        <input type="text" id="savings" placeholder="Monthly Savings e.g. 10k">
+      </div>
+
+      <div class="section-label">🛒 Monthly Expenses</div>
+      <div class="form-grid">
+        <input type="text" id="food" placeholder="Food (₹)">
+        <input type="text" id="rent" placeholder="Rent (₹)">
+        <input type="text" id="petrol" placeholder="Transport (₹)">
+        <input type="text" id="bills" placeholder="Bills (₹)">
+        <input type="text" id="shopping" placeholder="Shopping (₹)">
+        <input type="text" id="entertainment" placeholder="Entertainment (₹)">
+      </div>
+
+      <div class="section-label">🏦 Loans & Liabilities</div>
+      <div class="form-grid">
+        <input type="text" id="emi" placeholder="EMI e.g. 15k, 45k">
+        <input type="text" id="loanOutstanding" placeholder="Total Loan e.g. 30L">
+      </div>
+
+      <div class="section-label">🛡️ Insurance Coverage</div>
+      <div class="form-grid">
+        <label class="checkbox-row">
+          <input type="checkbox" id="hasHealth"> Health Insurance
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="hasTerm"> Term Insurance
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="hasVehicle"> Vehicle Insurance
+        </label>
+        <label class="checkbox-row">
+          <input type="checkbox" id="hasEmergency"> Emergency Fund
+        </label>
+      </div>
+
+      <div class="section-label">📊 Investment Profile</div>
+      <div class="form-grid single">
+        <select id="risk">
+          <option value="low">Low Risk — Safety first (FD, PPF, Bonds)</option>
+          <option value="medium" selected>Medium Risk — Balanced growth (SIP, MF, Gold)</option>
+          <option value="high">High Risk — Aggressive growth (Stocks, Equity)</option>
+        </select>
+        <input type="text" id="years" placeholder="Investment horizon (years)">
+      </div>
+
+      <button class="analyze-btn" onclick="analyzePlan()">📊 Analyze My Finances</button>
+    </div>
+
+    <div class="score-card">
+      <div class="score-label">Financial Health Score</div>
+      <div class="score-ring">
+        <svg viewBox="0 0 180 180" width="180" height="180">
+          <circle class="score-ring-bg" cx="90" cy="90" r="78"/>
+          <circle class="score-ring-fill" id="scoreRing" cx="90" cy="90" r="78"
+            stroke-dasharray="490"
+            stroke-dashoffset="490"
+            stroke="var(--green)"/>
+        </svg>
+        <div class="score-number" id="scoreNumber" style="color: var(--green)">—</div>
+      </div>
+      <div class="score-grade" id="scoreGrade">Fill your details and click Analyze</div>
+
+      <div class="vuln-list" id="vulnList">
+        <div class="vuln-item"><div class="vuln-dot warn"></div>No data yet — complete the form</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="analysis-cards-row">
+    <div class="mini-card"><h4>Emergency Fund Needed</h4><div class="val" id="emergencyFund">₹—</div></div>
+    <div class="mini-card"><h4>Suggested SIP</h4><div class="val" id="sipPlan">₹—</div></div>
+    <div class="mini-card"><h4>Debt-to-Income Ratio</h4><div class="val" id="debtRatio">—%</div></div>
+    <div class="mini-card"><h4>Savings Rate</h4><div class="val" id="savingsRate">—%</div></div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="info-card">
+      <h3>Portfolio Allocation</h3>
+      <div class="allocation-grid" id="allocGrid">
+        <div class="placeholder">Run analysis first</div>
+      </div>
+    </div>
+    <div class="info-card">
+      <h3>Allocation Chart</h3>
+      <div class="chart-wrap">
+        <canvas id="allocationChart"></canvas>
+      </div>
+    </div>
+    <div class="info-card">
+      <h3>Recommended Plan</h3>
+      <div id="result"><div class="placeholder">Run analysis first</div></div>
+    </div>
+  </div>
+
+  <div class="insight-box" id="insightBox">
+    💡 Fill in your financial details above and click <strong>Analyze My Finances</strong> to get personalized insights and recommendations.
+  </div>
+
+  <div class="goal-year-grid">
+
+    <div class="goal-card">
+      <h3>🎯 Dream Goal Planner</h3>
+      <p>Calculate how long it takes to reach your financial goal with SIP.</p>
+      <div class="goal-inputs">
+        <input type="text" id="goalAmount" placeholder="Target e.g. 4Cr, 50L">
+        <input type="text" id="goalSip" placeholder="SIP e.g. 15k">
+        <input type="text" id="goalReturn" placeholder="Expected Return % e.g. 12">
+        <input type="text" id="goalLumpsum" placeholder="Lump Sum e.g. 25L (optional)">
+      </div>
+      <button class="calc-btn" onclick="calculateGoal()">Calculate Goal Timeline</button>
+      <div class="goal-result" id="goalResult"></div>
+    </div>
+
+    <div class="goal-card">
+      <h3>🏁 Year Number Calculator</h3>
+      <p>Find out how many years until your investments generate your monthly expenses passively (Financial Independence).</p>
+      <div class="goal-inputs">
+        <input type="text" id="ynMonthlyExpense" placeholder="Expenses e.g. 40k">
+        <input type="text" id="ynCurrentSavings" placeholder="Savings e.g. 5L (optional)">
+        <input type="text" id="ynMonthlySip" placeholder="SIP e.g. 15k">
+        <input type="text" id="ynReturn" placeholder="Expected Annual Return % e.g. 12">
+      </div>
+      <button class="calc-btn" onclick="calculateYearNumber()">Calculate Freedom Year</button>
+      <div class="goal-result" id="yearResult"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>window.RUPEE_AI_KEY = "";</script>
+<script src="js/rupee-rise-assistant.js"></script>
+<script src="planner.js"></script>
+</body>
+</html>

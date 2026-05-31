@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RupeeRise — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --green: #00C896;
+    --yellow: #FFD166;
+    --red: #FF6B6B;
+    --blue: #4f7cff;
+    --purple: #9B59B6;
+    --bg: #0A0F0A;
+    --surface: #111811;
+    --surface2: #1a221a;
+    --border: rgba(0,200,150,0.15);
+    --text: #e8f5e8;
+    --muted: #6b8f6b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Sora', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  nav {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 40px; border-bottom: 1px solid var(--border);
+    background: var(--surface); position: sticky; top: 0; z-index: 100;
+  }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--green); }
+  .nav-logo span { color: var(--muted); font-size: 13px; font-family: 'Sora', sans-serif; font-weight: 300; margin-left: 6px; }
+  .nav-links { display: flex; gap: 24px; align-items: center; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--green); }
+  .nav-user { font-size: 13px; color: var(--green); font-weight: 600; }
+
+  .dash-wrap { max-width: 1200px; margin: 0 auto; padding: 40px 24px; }
+
+  .welcome-bar {
+    background: linear-gradient(135deg, rgba(0,200,150,0.1), rgba(0,163,255,0.05));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px 32px;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .welcome-bar h2 { font-family: 'DM Serif Display', serif; font-size: 26px; color: var(--text); }
+  .welcome-bar h2 span { color: var(--green); }
+  .welcome-bar p { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .score-badge {
+    text-align: center;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 28px;
+  }
+  .score-badge .score-val { font-size: 42px; font-weight: 700; line-height: 1; }
+  .score-badge .score-lbl { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  .no-data {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--muted);
+  }
+  .no-data h3 { font-size: 20px; margin-bottom: 12px; color: var(--text); }
+  .no-data a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 28px;
+    background: var(--green);
+    color: #0a0f0a;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px;
+  }
+  .stat-card .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+  .stat-card .value { font-size: 26px; font-weight: 700; color: var(--green); line-height: 1; }
+  .stat-card .sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .stat-card.red .value { color: var(--red); }
+  .stat-card.yellow .value { color: var(--yellow); }
+  .stat-card.blue .value { color: var(--blue); }
+
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .chart-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+  }
+  .chart-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 20px; color: var(--text); }
+  .chart-wrap { position: relative; height: 240px; }
+
+  .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px; }
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+  }
+  .panel h3 { font-size: 15px; font-weight: 600; margin-bottom: 20px; }
+
+  .insurance-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .insurance-item:last-child { border-bottom: none; }
+  .ins-left { display: flex; align-items: center; gap: 10px; }
+  .ins-icon { font-size: 18px; }
+  .ins-name { font-weight: 500; }
+  .ins-desc { font-size: 11px; color: var(--muted); }
+  .badge {
+    padding: 4px 10px; border-radius: 20px;
+    font-size: 11px; font-weight: 600;
+  }
+  .badge.ok { background: rgba(0,200,150,0.12); color: var(--green); }
+  .badge.bad { background: rgba(255,107,107,0.12); color: var(--red); }
+
+  .alert-item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px; border-radius: 12px; margin-bottom: 10px;
+    font-size: 13px; line-height: 1.5;
+  }
+  .alert-item:last-child { margin-bottom: 0; }
+  .alert-item.red { background: rgba(255,107,107,0.08); border: 1px solid rgba(255,107,107,0.2); }
+  .alert-item.yellow { background: rgba(255,209,102,0.08); border: 1px solid rgba(255,209,102,0.2); }
+  .alert-item.green { background: rgba(0,200,150,0.08); border: 1px solid rgba(0,200,150,0.2); }
+  .alert-icon { font-size: 16px; flex-shrink: 0; }
+
+  .projection-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    margin-bottom: 28px;
+  }
+  .projection-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 20px; }
+  .projection-wrap { height: 200px; }
+
+  .actions-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .action-btn {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-family: 'Sora', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+  }
+  .action-btn.primary { background: var(--green); color: #0a0f0a; border: none; }
+  .action-btn.primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .action-btn.secondary { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .action-btn.secondary:hover { border-color: var(--green); color: var(--green); }
+
+  @media (max-width: 900px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .charts-row { grid-template-columns: 1fr; }
+    .bottom-row { grid-template-columns: 1fr; }
+    .welcome-bar { flex-direction: column; gap: 20px; }
+  }
+  @media (max-width: 600px) {
+    .dash-wrap { padding: 20px 12px; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    nav { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="window.location.href='index.html'">
+    RupeeRise <span>/ invest smart</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="planner.html">Planner</a>
+    <a href="auth.html">Login</a>
+    <span class="nav-user" id="navUser"></span>
+  </div>
+</nav>
+
+<div class="dash-wrap" id="dashWrap">
+  <!-- Filled by JS -->
+</div>
+
+<script>
+  // ── HELPERS ──
+  function formatAmount(num) {
+    if (!num) return '₹0';
+    if (num >= 10000000) return '₹' + (num / 10000000).toFixed(1).replace(/\.0$/, "") + "Cr";
+    if (num >= 100000)   return '₹' + (num / 100000).toFixed(1).replace(/\.0$/, "") + "L";
+    if (num >= 1000)     return '₹' + (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+    return '₹' + Math.round(num).toLocaleString();
+  }
+
+  function getScoreColor(score) {
+    if (score >= 80) return '#00C896';
+    if (score >= 60) return '#00C896';
+    if (score >= 40) return '#FFD166';
+    if (score >= 20) return '#FF6B6B';
+    return '#FF6B6B';
+  }
+
+  function getScoreGrade(score) {
+    if (score >= 80) return 'Excellent 🌟';
+    if (score >= 60) return 'Good 👍';
+    if (score >= 40) return 'Average ⚠️';
+    if (score >= 20) return 'Poor 🔴';
+    return 'Critical 🚨';
+  }
+
+  // ── LOAD DATA ──
+  const user = JSON.parse(localStorage.getItem('rr_user') || '{}');
+
+  // ✅ FIX: Build per-user key — same logic as planner.js and widget
+  const uid = user.id || user.email || user.name || '__guest__';
+  const finance = JSON.parse(localStorage.getItem('rr_finance_' + uid) || '{}');
+
+  const wrap = document.getElementById('dashWrap');
+
+  // Show username in nav
+  if (user.fullname) {
+    document.getElementById('navUser').textContent = '👤 ' + user.fullname.split(' ')[0];
+  }
+
+  // No data state
+  if (!finance.salary) {
+    wrap.innerHTML = `
+      <div class="no-data">
+        <div style="font-size:60px; margin-bottom:16px;">📊</div>
+        <h3>No financial data yet!</h3>
+        <p>Complete your financial planner first to see your personalized dashboard.</p>
+        <a href="planner.html">Go to Planner →</a>
+      </div>
+    `;
+  } else {
+    buildDashboard();
+  }
+
+  function buildDashboard() {
+    const { salary=0, savings=0, food=0, rent=0, petrol=0, bills=0,
+            shopping=0, entertainment=0, emi=0, loanOutstanding=0,
+            risk='medium', score=0, sip=0,
+            hasHealth=false, hasTerm=false, hasVehicle=false, hasEmergency=false } = finance;
+
+    const totalExpense  = food + rent + petrol + bills + shopping + entertainment + emi;
+    const savingsRate   = salary > 0 ? Math.round((savings / salary) * 100) : 0;
+    const debtRatio     = salary > 0 ? Math.round((emi / salary) * 100) : 0;
+    const disposable    = salary - totalExpense;
+    const scoreColor    = getScoreColor(score);
+    const scoreGrade    = getScoreGrade(score);
+
+    // ── BUILD ALERTS ──
+    const alerts = [];
+    if (!hasHealth)     alerts.push({ type: 'red',    icon: '🔴', text: 'No health insurance! A single medical emergency can wipe out your savings.' });
+    if (!hasTerm)       alerts.push({ type: 'red',    icon: '🔴', text: 'No term insurance! Protect your family financially — costs only ₹500-1000/month.' });
+    if (!hasEmergency)  alerts.push({ type: 'yellow', icon: '⚠️', text: `Build an emergency fund of ${formatAmount(totalExpense * 6)} (6 months of expenses).` });
+    if (debtRatio > 40) alerts.push({ type: 'red',    icon: '🔴', text: `Your EMI is ${debtRatio}% of income — very high! Try to prepay loans.` });
+    if (savingsRate < 10) alerts.push({ type: 'yellow', icon: '⚠️', text: `Savings rate is only ${savingsRate}%. Try the 50-30-20 rule.` });
+    if (score >= 70)    alerts.push({ type: 'green',  icon: '✅', text: `Great job! Financial score ${score}/100. Keep investing ₹${formatAmount(sip)}/month.` });
+
+    // ── RENDER HTML ──
+    wrap.innerHTML = `
+      <div class="welcome-bar">
+        <button onclick="generatePDFReport()" class="action-btn secondary">📄 Download PDF Report</button>
+        <div>
+          <h2>Welcome back, <span>${user.fullname || 'Investor'}</span> 👋</h2>
+          <p>Here's your complete financial health overview · Last updated just now</p>
+          <div class="actions-row" style="margin-top:16px;">
+            <a href="planner.html" class="action-btn primary">📊 Update Planner</a>
+            <a href="index.html" class="action-btn secondary">🏠 Home</a>
+          </div>
+        </div>
+        <div class="score-badge">
+          <div class="score-val" style="color:${scoreColor}">${score}</div>
+          <div style="font-size:13px; color:${scoreColor}; margin-top:4px;">${scoreGrade}</div>
+          <div class="score-lbl">Financial Score</div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="label">Monthly Income</div>
+          <div class="value">${formatAmount(salary)}</div>
+          <div class="sub">Per month</div>
+        </div>
+        <div class="stat-card ${savingsRate < 10 ? 'yellow' : ''}">
+          <div class="label">Savings Rate</div>
+          <div class="value">${savingsRate}%</div>
+          <div class="sub">${formatAmount(savings)}/month saved</div>
+        </div>
+        <div class="stat-card ${debtRatio > 40 ? 'red' : debtRatio > 20 ? 'yellow' : ''}">
+          <div class="label">Debt-to-Income</div>
+          <div class="value">${debtRatio}%</div>
+          <div class="sub">EMI ${formatAmount(emi)}/month</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="label">Suggested SIP</div>
+          <div class="value">${formatAmount(sip)}</div>
+          <div class="sub">Per month</div>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="chart-card">
+          <h3>💸 Monthly Spending Breakdown</h3>
+          <div class="chart-wrap">
+            <canvas id="spendingChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <h3>💰 Income Distribution</h3>
+          <div class="chart-wrap">
+            <canvas id="incomeChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="projection-card">
+        <h3>📈 SIP Growth Projection (20 years at 12% return)</h3>
+        <div class="projection-wrap">
+          <canvas id="projectionChart"></canvas>
+        </div>
+      </div>
+
+      <div class="bottom-row">
+        <div class="panel">
+          <h3>🛡️ Insurance & Protection</h3>
+          <div class="insurance-item">
+            <div class="ins-left">
+              <div class="ins-icon">🏥</div>
+              <div><div class="ins-name">Health Insurance</div><div class="ins-desc">Covers medical emergencies</div></div>
+            </div>
+            <span class="badge ${hasHealth ? 'ok' : 'bad'}">${hasHealth ? 'Covered' : 'Missing'}</span>
+          </div>
+          <div class="insurance-item">
+            <div class="ins-left">
+              <div class="ins-icon">🛡️</div>
+              <div><div class="ins-name">Term Insurance</div><div class="ins-desc">Family financial protection</div></div>
+            </div>
+            <span class="badge ${hasTerm ? 'ok' : 'bad'}">${hasTerm ? 'Covered' : 'Missing'}</span>
+          </div>
+          <div class="insurance-item">
+            <div class="ins-left">
+              <div class="ins-icon">🚗</div>
+              <div><div class="ins-name">Vehicle Insurance</div><div class="ins-desc">Car/bike protection</div></div>
+            </div>
+            <span class="badge ${hasVehicle ? 'ok' : 'bad'}">${hasVehicle ? 'Covered' : 'Missing'}</span>
+          </div>
+          <div class="insurance-item">
+            <div class="ins-left">
+              <div class="ins-icon">💰</div>
+              <div><div class="ins-name">Emergency Fund</div><div class="ins-desc">Need ${formatAmount(totalExpense * 6)}</div></div>
+            </div>
+            <span class="badge ${hasEmergency ? 'ok' : 'bad'}">${hasEmergency ? 'Ready' : 'Missing'}</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>🔔 Smart Alerts</h3>
+          ${alerts.length === 0
+            ? '<div style="color:var(--muted); font-size:13px;">No alerts — everything looks good! 🎉</div>'
+            : alerts.map(a => `
+              <div class="alert-item ${a.type}">
+                <span class="alert-icon">${a.icon}</span>
+                <span>${a.text}</span>
+              </div>
+            `).join('')
+          }
+        </div>
+      </div>
+    `;
+
+    // ── SPENDING CHART ──
+    const spendingData = [];
+    const spendingLabels = [];
+    const spendingColors = ['#4f7cff','#00C896','#FFD166','#FF6B6B','#9B59B6','#E67E22','#1ABC9C'];
+    const items = [
+      { label: 'Food', val: food },
+      { label: 'Rent', val: rent },
+      { label: 'Transport', val: petrol },
+      { label: 'Bills', val: bills },
+      { label: 'Shopping', val: shopping },
+      { label: 'Entertainment', val: entertainment },
+      { label: 'EMI', val: emi },
+    ];
+    items.forEach(i => { if (i.val > 0) { spendingLabels.push(i.label); spendingData.push(i.val); } });
+
+    new Chart(document.getElementById('spendingChart'), {
+      type: 'doughnut',
+      data: {
+        labels: spendingLabels,
+        datasets: [{ data: spendingData, backgroundColor: spendingColors, borderWidth: 0 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'right', labels: { color: '#e8f5e8', font: { family: 'Sora', size: 11 }, boxWidth: 12 } } }
+      }
+    });
+
+    // ── INCOME CHART ──
+    new Chart(document.getElementById('incomeChart'), {
+      type: 'bar',
+      data: {
+        labels: ['Income', 'Expenses', 'Savings', 'Disposable'],
+        datasets: [{
+          data: [salary, totalExpense, savings, Math.max(disposable, 0)],
+          backgroundColor: ['#00C896', '#FF6B6B', '#4f7cff', '#FFD166'],
+          borderRadius: 8, borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { color: '#6b8f6b', callback: v => formatAmount(v) }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          x: { ticks: { color: '#6b8f6b' }, grid: { display: false } }
+        }
+      }
+    });
+
+    // ── SIP PROJECTION CHART ──
+    const projLabels = [];
+    const projData = [];
+    const monthlyReturn = 12 / 12 / 100;
+    let total = 0;
+    for (let y = 1; y <= 20; y++) {
+      for (let m = 0; m < 12; m++) { total = (total + sip) * (1 + monthlyReturn); }
+      projLabels.push(`Year ${y}`);
+      projData.push(Math.round(total));
+    }
+
+    new Chart(document.getElementById('projectionChart'), {
+      type: 'line',
+      data: {
+        labels: projLabels,
+        datasets: [{
+          label: 'Portfolio Value',
+          data: projData,
+          borderColor: '#00C896',
+          backgroundColor: 'rgba(0,200,150,0.08)',
+          fill: true, tension: 0.4, pointRadius: 3,
+          pointBackgroundColor: '#00C896'
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { ticks: { color: '#6b8f6b', callback: v => formatAmount(v) }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          x: { ticks: { color: '#6b8f6b', maxTicksLimit: 10 }, grid: { display: false } }
+        }
+      }
+    });
+  }
+</script>
+
+<script>window.RUPEE_AI_KEY = "";</script>
+<script src="js/rupee-rise-assistant.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="js/report-generator.js"></script>
+</body>
+</html>

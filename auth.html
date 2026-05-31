@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RupeeRise — Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --green: #00C896;
+            --green-dark: #00A87C;
+            --bg: #0A0F0A;
+            --surface: #111811;
+            --surface2: #1a221a;
+            --border: rgba(0,200,150,0.15);
+            --text: #e8f5e8;
+            --muted: #6b8f6b;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* Animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 50% at 20% 50%, rgba(0,200,150,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 40% at 80% 20%, rgba(0,163,255,0.05) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .container {
+            display: flex;
+            width: 900px;
+            min-height: 560px;
+            border-radius: 24px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 40px 120px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,200,150,0.08);
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Left panel */
+        .left {
+            flex: 1;
+            background: linear-gradient(135deg, #0d1f0d 0%, #0a1a1f 100%);
+            padding: 60px 48px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        .left::before {
+            content: '';
+            position: absolute;
+            width: 300px; height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,200,150,0.12), transparent 70%);
+            bottom: -80px; right: -80px;
+        }
+        .logo {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            color: var(--green);
+            letter-spacing: -0.5px;
+        }
+        .logo span { color: var(--text); opacity: 0.5; font-size: 14px; font-family: 'Sora', sans-serif; display: block; margin-top: 4px; font-weight: 300; }
+
+        .left-content h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 36px;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            color: var(--text);
+        }
+        .left-content h2 em { color: var(--green); font-style: italic; }
+        .left-content p { color: var(--muted); font-size: 14px; line-height: 1.7; font-weight: 300; }
+
+        .stats {
+            display: flex;
+            gap: 24px;
+            margin-top: 32px;
+        }
+        .stat { text-align: left; }
+        .stat-num { font-size: 22px; font-weight: 700; color: var(--green); display: block; }
+        .stat-label { font-size: 11px; color: var(--muted); }
+
+        /* Right panel */
+        .right {
+            width: 420px;
+            background: var(--surface);
+            padding: 48px 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: var(--surface2);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 32px;
+            border: 1px solid var(--border);
+        }
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 9px;
+            color: var(--muted);
+            transition: all 0.25s;
+            border: none;
+            background: none;
+            font-family: 'Sora', sans-serif;
+        }
+        .tab.active {
+            background: var(--green);
+            color: #0a0f0a;
+            font-weight: 600;
+        }
+
+        /* Forms */
+        .form { display: none; flex-direction: column; gap: 14px; }
+        .form.active { display: flex; }
+
+        .form-title {
+            font-size: 22px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+        .form-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 13px 16px;
+            color: var(--text);
+            font-family: 'Sora', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input::placeholder { color: var(--muted); }
+        input:focus { border-color: var(--green); }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--green), #00A3FF);
+            border: none;
+            border-radius: 12px;
+            color: #0a0f0a;
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: opacity 0.2s, transform 0.2s;
+        }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .msg {
+            text-align: center;
+            font-size: 13px;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+        }
+        .msg.success { background: rgba(0,200,150,0.1); color: var(--green); border: 1px solid rgba(0,200,150,0.2); display: block; }
+        .msg.error { background: rgba(255,80,80,0.1); color: #ff6b6b; border: 1px solid rgba(255,80,80,0.2); display: block; }
+
+        .switch-text {
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+        .switch-text a {
+            color: var(--green);
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container { flex-direction: column; width: 95vw; min-height: auto; }
+            .left { padding: 36px 28px; }
+            .right { width: 100%; padding: 36px 28px; }
+            .left-content h2 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Left -->
+    <div class="left">
+        <div class="logo">
+            RupeeRise
+            <span>/ invest smart</span>
+        </div>
+        <div class="left-content">
+            <h2>Grow your money<br><em>the smart way</em></h2>
+            <p>Get AI-powered investment advice, compare returns across FD, SIP, Gold and Mutual Funds, and plan your financial future.</p>
+            <div class="stats">
+                <div class="stat">
+                    <span class="stat-num">10+</span>
+                    <span class="stat-label">Investment types</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">Free</span>
+                    <span class="stat-label">Always</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-num">AI</span>
+                    <span class="stat-label">Powered</span>
+                </div>
+            </div>
+        </div>
+        <div style="font-size:11px; color: var(--muted);">For educational purposes only. Consult a SEBI-registered advisor.</div>
+    </div>
+
+    <!-- Right -->
+    <div class="right">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('login')">Login</button>
+            <button class="tab" onclick="switchTab('signup')">Sign Up</button>
+        </div>
+
+        <!-- Login Form -->
+        <div class="form active" id="form-login">
+            <div class="form-title">Welcome back 👋</div>
+            <div class="form-sub">Login to your RupeeRise account</div>
+            <div class="msg" id="login-msg"></div>
+            <input type="email" id="login-email" placeholder="Email Address" required>
+            <input type="password" id="login-password" placeholder="Password" required>
+            <button class="btn" onclick="handleLogin()">Login</button>
+            <div class="switch-text">Don't have an account? <a onclick="switchTab('signup')">Sign up</a></div>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="form" id="form-signup">
+            <div class="form-title">Create account ✨</div>
+            <div class="form-sub">Start your smart financial journey</div>
+            <div class="msg" id="signup-msg"></div>
+            <input type="text" id="signup-name" placeholder="Full Name" required>
+            <input type="email" id="signup-email" placeholder="Email Address" required>
+            <input type="password" id="signup-password" placeholder="Password (min 6 chars)" required>
+            <button class="btn" onclick="handleSignup()">Create Account</button>
+            <div class="switch-text">Already have an account? <a onclick="switchTab('login')">Login</a></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tab) {
+        document.querySelectorAll('.tab').forEach((t, i) => {
+            t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'signup'));
+        });
+        document.getElementById('form-login').classList.toggle('active', tab === 'login');
+        document.getElementById('form-signup').classList.toggle('active', tab === 'signup');
+    }
+
+    function showMsg(id, text, type) {
+        const el = document.getElementById(id);
+        el.textContent = text;
+        el.className = `msg ${type}`;
+    }
+
+    async function handleSignup() {
+        const fullname = document.getElementById('signup-name').value.trim();
+        const email = document.getElementById('signup-email').value.trim();
+        const password = document.getElementById('signup-password').value;
+
+        if (!fullname || !email || !password) return showMsg('signup-msg', 'Please fill all fields', 'error');
+        if (password.length < 6) return showMsg('signup-msg', 'Password must be at least 6 characters', 'error');
+
+        const btn = document.querySelector('#form-signup .btn');
+        btn.disabled = true;
+        btn.textContent = 'Creating account...';
+
+        try {
+            const res = await fetch('http://localhost:5000/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ fullname, email, password })
+            });
+            const data = await res.json();
+            if (res.ok) {
+
+    localStorage.setItem(
+        'rr_user',
+        JSON.stringify(data.user || { fullname, email })
+    );
+
+    showMsg('signup-msg', '✅ Account created! Redirecting...', 'success');
+
+    setTimeout(() => {
+        window.location.href = 'index.html';
+    }, 1000);
+}
+            else {
+                showMsg('signup-msg', data.error || 'Signup failed', 'error');
+            }
+        } catch (err) {
+            showMsg('signup-msg', 'Server error. Is the server running?', 'error');
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Create Account';
+    }
+
+    async function handleLogin() {
+
+    const email =
+        document.getElementById('login-email').value.trim();
+
+    const password =
+        document.getElementById('login-password').value;
+
+    if (!email || !password) {
+
+        return showMsg(
+            'login-msg',
+            'Please fill all fields',
+            'error'
+        );
+    }
+
+    try {
+
+        const res = await fetch(
+            'http://localhost:5000/login',
+            {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    email,
+                    password
+                })
+            }
+        );
+
+        const data = await res.json();
+
+        console.log(data);
+
+        if (data.success) {
+
+            localStorage.setItem(
+                'rr_user',
+                JSON.stringify(data.user)
+            );
+
+            showMsg(
+                'login-msg',
+                '✅ Login successful!',
+                'success'
+            );
+
+            setTimeout(() => {
+
+                window.location.href =
+                    "index.html";
+
+            }, 1000);
+
+        } else {
+
+            showMsg(
+                'login-msg',
+                data.error || 'Login failed',
+                'error'
+            );
+        }
+
+    } catch (err) {
+
+        console.log(err);
+
+        showMsg(
+            'login-msg',
+            'Server error',
+            'error'
+        );
+    }
+}
+
+   
+
+    // Enter key support
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            if (document.getElementById('form-login').classList.contains('active')) handleLogin();
+            else handleSignup();
+        }
+    });
+</script>
+
+</body>
+</html>
