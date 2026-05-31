@@ -224,9 +224,8 @@ document.head.appendChild(marketStyles);
 async function fetchQuote(symbol) {
     try {
         const res = await fetch(
-    `http://localhost:5000/api/market/${symbol}`,
-       
-        { headers: { 'Accept': 'application/json' } }
+            `https://ruppee-rise.onrender.com/api/market/${symbol}`,
+            { headers: { 'Accept': 'application/json' } }
         );
         const data = await res.json();
         const meta = data?.chart?.result?.[0]?.meta;
@@ -239,7 +238,6 @@ async function fetchQuote(symbol) {
         };
     } catch { return null; }
 }
-
 async function fetchGoldPrice() {
     try {
         // Gold in USD per troy oz → convert to INR per gram
